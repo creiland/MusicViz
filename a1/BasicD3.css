@@ -1,0 +1,44 @@
+.chart div {
+    font: 10px sans-serif;
+    background-color: steelblue;
+    text-align: right;
+    padding: 3px;
+    margin: 1px;
+    color: white;
+  }
+
+  .svg-chart rect {
+    fill: steelblue;
+  }
+  
+  .svg-chart text {
+    font: 10px sans-serif;
+    color: black;
+  }
+
+  .bar {
+    fill: steelblue;
+  }
+  
+  .axis text {
+    font: 10px sans-serif;
+  }
+  
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+  
+  .x.axis path {
+    display: none;
+  }
+
+  .spacer{
+    height:10px;
+  }
+
+  .barcharts{
+    margin:1em
+  }
