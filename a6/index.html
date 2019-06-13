@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href='BPM.css'>
+<link rel="stylesheet" href="https://use.typekit.net/euq6nxa.css">
+
+
+  <div id="viz-container"></div>
+  <canvas
+    id="analyzerCanvas">
+  </canvas>
+
+  <audio id="audio" controls>
+    <source src="rave.mp3" type="audio/wav"/>
+  </audio>
+  <button onclick="setAudio(event)">Set Audio</button>
+  <button onclick="play(event)">Vizualize BPM</button>
+  <button onclick="print(event)">Print BPM</button>
+  <input id="file-input" type="file" value="./rave.mp3">
+
+  <script src="//d3js.org/d3.v4.min.js"></script>
+<script src='BPM.js'></script>

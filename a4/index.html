@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href='StereoD3.css'>
+<link rel="stylesheet" href="https://use.typekit.net/euq6nxa.css">
+
+
+  <div id="viz-container"></div>
+  <canvas
+    id="analyzerCanvas">
+  </canvas>
+
+  <audio id="audio" controls>
+    <source src="FreezingRain.wav" type="audio/wav"/>
+  </audio>
+  <button onclick="handleButton(event)">Set Audio</button>
+  <button onclick="play(event)">Vizualize Audio</button>
+
+  <script src="//d3js.org/d3.v4.min.js"></script>
+<script src='StereoD3.js'></script>

@@ -1,0 +1,25 @@
+body{
+    height: 100%;
+}
+
+* {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+
+html{
+    height:100%;
+}
+
+audio{
+    display:block;
+}
+
+#viz-container{
+    margin-top: 2em;
+}
+
+@font-face {
+    font-family: 'Gilroy-ExtraBold';
+    src: local('Gilroy-ExtraBold'), url(./assets/font/Gilroy-ExtraBold.otf) format('woff');
+  }
+

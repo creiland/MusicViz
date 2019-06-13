@@ -52,14 +52,35 @@ d3.json( wave_uri, function(error, json) {
                   .attr("transform", function(d, i){ return "translate(" + (i*barWidth) + ",0)"})
                   .style("fill", color)
 
-    bar.append("rect")
+    var waves = bar.append("rect")
+        // .attr("y", function(d){
+        //   var yvalue = height - Math.abs(y(d)/2) - height/2 + 2
+        //   return yvalue
+        // })
+        .attr("y", function(d){
+          var yvalue = height/2
+          return yvalue
+        })
+        .attr("width", barWidth)
+
+        //.attr("height", function(d){return y(d)})
+        waves.transition()
+        .attr("height", function(d) { return Math.abs(y(d)); })
+        .delay(function (data, i) {
+                return i*1.5;
+            })
+            //.duration(500)
+            .ease(d3.easeElastic)
+        //.attr("height", function(d) { return Math.abs(y(d)); })
         .attr("y", function(d){
           var yvalue = height - Math.abs(y(d)/2) - height/2 + 2
           return yvalue
         })
-        .attr("height", function(d){return Math.abs(y(d))})
-        .attr("width", barWidth)
-        .on('mouseover', onMouseOver)
+
+        waves.on('mouseover', onMouseOver)
+        // .on('mouseover', function() {
+        //   onMouseOver(data, d, i)
+        // })
         .on('mousemove', onMouseMove)
         .on('mouseleave', onMouseLeave)
         .on('click', onMouseClick)
