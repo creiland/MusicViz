@@ -3,7 +3,18 @@
 <link rel="stylesheet" href="https://use.typekit.net/euq6nxa.css">
 
 
-  <div id="viz-container"></div>
+  <div id="viz-container">
+      <div id='text-container'>
+          <h2>Instructions</h2>
+          <p>Click Visualize Audio to analyze to retrieve the BPM of the song.</p>
+          <h2>Explanation</h2>
+          <p> This visualization leverages an algorithm to determine the tempo of a given song. It produces 3 related data points. 
+            The bar chart on the bottom plots the peaks returned from the algorithm at their time position in the track on the X-Axis. 
+            Each bar represents a kick drum at either quarter, half, or full notes. The visualization above displays the analyzed BPM surrounded by an arc showing the current beat in a measure.
+            The arc represents one full measure, with each quarter turn representing a quarter note.
+             </p>
+      </div>
+  </div>
   <div id="peaks-viz"></div>
 
   <div class='controls'>
@@ -12,8 +23,6 @@
           <source id='audio-src' src='./short.mp3' type="audio/wav"/>
         </audio>
   </div>
-
-  <input id="file-input" type="file" value="./rave.mp3">
 
   <script src="//d3js.org/d3.v4.min.js"></script>
 <script src='BPM.js'></script>
