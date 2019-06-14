@@ -5,7 +5,13 @@ var width = 880,
 height    = 140;
 
 //simulated track length of 4 minutes 15 seconds
-let trackLength = 255
+
+var audioRef = document.getElementById('audio');
+
+audioRef.onloadedmetadata = function() {
+  console.log(audioRef.duration)
+  trackLength = audioRef.duration
+};
 
 let color = "#ce243d"
 
@@ -20,7 +26,6 @@ d3.json( wave_uri, function(error, json) {
       lessPoints.push(waveJson[i+1])
       lessPoints.push(waveJson[i+2])
     }
-
     renderWaveform(lessPoints)
   });
 
@@ -53,34 +58,24 @@ d3.json( wave_uri, function(error, json) {
                   .style("fill", color)
 
     var waves = bar.append("rect")
-        // .attr("y", function(d){
-        //   var yvalue = height - Math.abs(y(d)/2) - height/2 + 2
-        //   return yvalue
-        // })
         .attr("y", function(d){
           var yvalue = height/2
           return yvalue
         })
         .attr("width", barWidth)
 
-        //.attr("height", function(d){return y(d)})
         waves.transition()
         .attr("height", function(d) { return Math.abs(y(d)); })
         .delay(function (data, i) {
                 return i*1.5;
             })
-            //.duration(500)
             .ease(d3.easeElastic)
-        //.attr("height", function(d) { return Math.abs(y(d)); })
         .attr("y", function(d){
           var yvalue = height - Math.abs(y(d)/2) - height/2 + 2
           return yvalue
         })
 
         waves.on('mouseover', onMouseOver)
-        // .on('mouseover', function() {
-        //   onMouseOver(data, d, i)
-        // })
         .on('mousemove', onMouseMove)
         .on('mouseleave', onMouseLeave)
         .on('click', onMouseClick)
@@ -116,7 +111,10 @@ d3.json( wave_uri, function(error, json) {
           .html("Leave a comment at " + mousePositionInTrack)
           .style("left", (d3.event.pageX+20) + "px")
           .style("top", (d3.event.pageY - 5) + "px")
-          .style("opacity", 1)
+          .style("opacity", .9)
+          .style("background-color", '#343a40')
+              .style("border", "none")
+              .style("position", 'absolute')
         }
 
       function onMouseMove(d, i){
@@ -146,7 +144,9 @@ d3.json( wave_uri, function(error, json) {
         .style("border-radius", "5px")
         .style("padding", "5px")
         .style("color", "white")
-        .style("position", "absolute")
+        .style("background-color", 'rgba(52,58,64, .9)')
+        .style("border", "none")
+        .style("position", 'absolute')
 
       CommentForm
         .append('textarea')
@@ -161,20 +161,11 @@ d3.json( wave_uri, function(error, json) {
 
       CommentForm
         .append('button')
+        .attr('class', 'post')
         .attr('type', 'submit')
         .text('Post')
         .style('border-radius', '20px')
         .on('click', postComment)
-        .on('mouseover', function(){
-          d3.select(this)
-            .style('background-color', 'white')
-            .style('color', 'black')
-        })
-        .on('mouseleave', function(){
-          d3.select(this)
-            .style('background-color', 'black')
-            .style('color', 'white')
-        })
 
 
       var commentText;
@@ -226,22 +217,38 @@ d3.json( wave_uri, function(error, json) {
                         .attr('fill', 'none')
 
         var newComment = d3.select('#viz-container').append('div')
+          .attr('class', 'new-comment')
           .style('left', w - 3 + "px")
           .style('top', height+25 + "px")
-          .style("background-color", "black")
-          .style("padding", "5px")
           .style("color", "white")
+          .style("background-color", 'rgba(52,58,64, .9)')
+          .style("border", "none")
+          .style("padding", "5px")
           .style('position', "absolute")
           .style('width', '200px')
-          .style('height', '100px')
+          .style('height', '50px')
           .style('display', 'flex')
           .style('flex-direction', "column")
 
-          newComment.append('div')
+          var userArea = newComment.append('div')
+                .attr('class', 'user-area')
+
+          userArea.append('img')
+          .attr('src', './profile-placeholder.png')
+
+          userArea.append('div')
+          .text("username")
+
+          var contentArea = newComment.append('div')
+            .attr('class', 'content-area')
+
+          contentArea.append('div')
+          .attr('class', 'time-tag')
           .text("@"+sTime)
-          .style('color', 'rgb(140,198,109)')
+          .style('color', 'rgba(140,198,109, .8)')
+          .on('click', seekTime)
           
-          newComment.append('div')
+          contentArea.append('div')
           .text(text)
           .style('color', 'white')
       }
@@ -254,4 +261,17 @@ d3.json( wave_uri, function(error, json) {
       seconds = "0"+seconds
     }
     return minutes + ":" + seconds
+  }
+
+  function minutesToSeconds(minutes){
+    let time = minutes.substring(1);
+    let arr = time.split(":")
+    let total = parseInt(arr[0]) * 60
+    total += parseInt(arr[1])
+    return total;
+  }
+
+  function seekTime(){
+    let seconds = minutesToSeconds(this.innerText);
+    audioRef.currentTime = seconds;
   }

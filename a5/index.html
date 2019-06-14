@@ -2,17 +2,39 @@
 <link rel="stylesheet" href='FA.css'>
 <link rel="stylesheet" href="https://use.typekit.net/euq6nxa.css">
 
+  <div class='main-container'>
+    <div id="mp3_player">
+        <div class="filter-results"><span id="freq-text"></span></div>
+        <div id="audio_box"></div>
+        <canvas
+            ref="helperCanvas"
+            id="hover-helper">
+            
+        </canvas>
+        <canvas
+            ref="analyzerCanvas"
+            id="analyzer"
+            className="waveform-viz">
+        </canvas>
+    </div>
+    <div id='text-container'>
+        <h2>Instructions</h2>
+        <p>Click visualize audio to begin playing audio and visualizing frequency data in real time. Click and drag to highlight a frequency range and apply and bandpass filter</p>
+        <h2>Explanation</h2>
+        <p> The Frequency Spectrum Analyser shows the decibel value of each frequency bin for the current audio. 
+          There are 4096 bins based on a Fast Fourier Tranformation applied to the audio frequency data. Clicking and dragging applies a filter to the output, 
+          reducing the volume of the audio outside the filter region.
+        </p>
+    </div>
+</div>
 
-  <div id="viz-container"></div>
-  <canvas
-    id="analyzerCanvas">
-  </canvas>
-
+<div class = 'controls'>
+  <button onclick="handleButton(event)">Vizualize Audio</button>
   <audio id="audio" controls>
     <source src="FreezingRain.wav" type="audio/wav"/>
   </audio>
-  <button onclick="handleButton(event)">Set Audio</button>
-  <button onclick="play(event)">Vizualize Audio</button>
+</div>
+
 
   <script src="//d3js.org/d3.v4.min.js"></script>
 <script src='FrequencyAnalyser.js'></script>

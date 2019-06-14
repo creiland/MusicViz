@@ -1,164 +1,91 @@
-freezeViz() {
-    if (!GlobalStore.isResizing) {
+let isResizing = false;
+let vizAudio = document.getElementById("audio");
+vizAudio.crossOrigin = 'anonymous';
+
+let dragging = false;
+let filtered = false;
+
+let analyser;
+
+//TODO: change all globalstore to global
+let filterLGlobal;
+let filterRGlobal;
+
+let vizAudioSrc = undefined ;
+let context;
+
+//filters
+let lp;
+let hp;
+
+let gain;
+
+
+freezeViz = () => {
+    if (isResizing) {
         document.getElementById("analyzer").style.display = "none";
-        GlobalStore.isResizing = true;
+        isResizing = true;
         window.setTimeout(function() {
             if (document.getElementById("analyzer")) {
                 document.getElementById("analyzer").style.display = "block";
             }
-            GlobalStore.isResizing = false;
+            isResizing = false;
         }, 1000);
     }
 }
 
-createVisualization(){
-    if(AuthStore.isAuthenticated){
-        GlobalStore.setAudioNode();
-    } else {
-        GlobalStore.setLPAudioNode();
-    }
+createVisualization = () => {
     
-    var canvas = this.refs.analyzerCanvas;
-    this.helper = this.refs.helperCanvas;
+    
+    var canvas = document.getElementById('analyzer')
+    var helper = document.getElementById('hover-helper');
     var ctx = canvas.getContext('2d');
-    GlobalStore.vizAudio = GlobalStore.audioRef
-    GlobalStore.vizAudio.crossOrigin = "anonymous";
-    GlobalStore.setVizAudioSrc();
-    if(AuthStore.isAuthenticated){
-        GlobalStore.connectAudioNodes(GlobalStore.context);
-    } else {
-        GlobalStore.connectAudioNodes(GlobalStore.lpContext);
-    }
+    setAudioNode();
+    setVizAudioSrc();
+    
+    //TODO
+    connectAudioNodes(context);
+  
     var mousePosX = null;
 
     var filterX = {press: null, release: null};
 
-    this.helper.addEventListener('mousemove', event => {
+    helper.addEventListener('mousemove', event => {
         let bound = canvas.getBoundingClientRect();
 
-        mousePosX = (event.clientX - bound.left) * ((canvas.width + 12) / canvas.width);
+        mousePosX = (event.clientX - bound.left) * ((canvas.width) / canvas.width);
     });
 
-    this.helper.addEventListener('mouseout', event => {
+    helper.addEventListener('mouseout', event => {
         mousePosX = null;
-        GlobalStore.dragging = false;
+        dragging = false;
     });
 
-    this.helper.addEventListener('mousedown', event => {
+    helper.addEventListener('mousedown', event => {
         let bound = canvas.getBoundingClientRect();
 
-        GlobalStore.dragging = true;
-        filterX.press = (event.clientX - bound.left - canvas.clientLeft) * ((canvas.width + 12) / canvas.width);
-        filterX.release = filterX.press + 10;
+        dragging = true;
+        filterX.press = (event.clientX - bound.left - canvas.clientLeft) * ((canvas.width) / canvas.width);
+        filterX.release = filterX.press;
     });
 
-    this.helper.addEventListener('mouseup', event => {
+    helper.addEventListener('mouseup', event => {
         let bound = canvas.getBoundingClientRect();
-        filterX.release = (event.clientX - bound.left - canvas.clientLeft) * ((canvas.width + 12) / canvas.width);
+        filterX.release = (event.clientX - bound.left - canvas.clientLeft) * ((canvas.width) / canvas.width);
         if (Math.abs(filterX.release - filterX.press) > 10) {
-            GlobalStore.filtered = true;
-            GlobalStore.filterAudio(filterX, canvas.width)
-            setTimeout(function(){ GlobalStore.dragging = false; }, 10);
+            filtered = true;
+            filterAudio(filterX, canvas.width)
+            setTimeout(function(){ dragging = false; }, 10);
         } else {
-            GlobalStore.filtered = false;
-            GlobalStore.dragging = false;
+            filtered = false;
+            dragging = false;
         }
     });
 
-    // RENDER LINES LOGARITHMICALLY
-
-    // function renderFrame(){
-    //     var freqData = new Uint8Array(GlobalStore.analyser.frequencyBinCount)
-    //     requestAnimationFrame(renderFrame)
-    //     GlobalStore.analyser.getByteFrequencyData(freqData)
-    //     ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-    //     let logBase = 1.072;
-    //     var logIndex = 1;
-    //     let segments = 100;
-
-    //     // start at origin
-    //     var originX = 0;
-    //     var originY = canvas.height;
-
-    //     for (var i = 1; i < segments; i++) {
-    //         ctx.beginPath();
-    //         originX = (i - 1) * 3;
-    //         ctx.moveTo(originX, originY);
-    //         var destX = originX + 3;
-    //         var destY = canvas.height - (freqData[Math.floor(logIndex)] / 2);
-    //         ctx.lineTo(destX, destY);
-    //         ctx.strokeStyle = "#000";
-    //         ctx.stroke();
-    //         ctx.moveTo(destX, destY);
-    //         originY = destY;
-    //         logIndex = logIndex * logBase;
-    //     }
-    // };
-
-    // RENDER BOXES LOGARITHMICALLY
-
-    // function renderFrame(){
-    //     var freqData = new Uint8Array(GlobalStore.analyser.frequencyBinCount)
-    //     requestAnimationFrame(renderFrame)
-    //     GlobalStore.analyser.getByteFrequencyData(freqData)
-    //     ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-    //     let logBase = 1.072;
-    //     var logIndex = 1;
-    //     let bars = 100;
-
-    //     for (var i = 1; i < bars + 1; i++) {
-    //         var bar_x = (i - 1) * 3;
-    //         var bar_width = 2;
-    //         if (i < 30) {
-
-    //         }
-    //         var bar_height = -(freqData[Math.floor(logIndex)] / 2);
-
-    //         // hover to select first bar
-    //         if (bar_x * 2 >= mousePosX - 3 && bar_x * 2 <= mousePosX + 3 && mousePosX && !GlobalStore.dragging) {
-    //             ctx.fillStyle = "rgba(140, 198, 109, 1)";
-            
-    //         // drag to select last bar
-    //         } else if (GlobalStore.dragging) {
-    //             let filterL = Math.min(filterX.press, mousePosX);
-    //             let filterR = Math.max(filterX.press, mousePosX);
-
-    //             GlobalStore.filterL = filterL;
-    //             GlobalStore.filterR = filterR;
-
-    //             if (bar_x * 2 >= filterL && bar_x * 2 <= filterR) {
-    //                 ctx.fillStyle = "rgba(140, 198, 109, 1)";
-    //             } else {
-    //                 ctx.fillStyle = "rgba(140, 198, 109, .3)"
-    //             }
-
-    //         // audio content filtered
-    //         } else if (GlobalStore.filtered) {
-
-    //             if (bar_x * 2 >= GlobalStore.filterL && bar_x * 2 <= GlobalStore.filterR) {
-    //                 ctx.fillStyle = "rgba(140, 198, 109, 1)";
-    //             } else {
-    //                 ctx.fillStyle = "#EEE"
-    //             }
-
-    //         // no current interaction
-    //         } else {
-    //             ctx.fillStyle = "rgba(140, 198, 109, .3)";
-    //         }
-    //         ctx.fillRect(bar_x, canvas.height, bar_width, bar_height)
-    //         logIndex = logIndex * logBase;
-    //         console.log(logIndex);
-    //     }
-    // };
-
-    // RENDER POLYGONS LOGARITHMICALLY
-
     function renderFrame(){
-        var freqData = new Uint8Array(GlobalStore.analyser.frequencyBinCount)
+        var freqData = new Uint8Array(analyser.frequencyBinCount)
         requestAnimationFrame(renderFrame)
-        GlobalStore.analyser.getByteFrequencyData(freqData)
+        analyser.getByteFrequencyData(freqData)
         ctx.clearRect(0, 0, canvas.width, canvas.height)
 
         // 1.072 for 100 bars
@@ -188,35 +115,40 @@ createVisualization(){
             bar_height = (bar_height / 2)
 
             // hover to select first bar
-            if (bar_x * 2 >= mousePosX - 2 && bar_x * 2 <= mousePosX + 2 && mousePosX && !GlobalStore.dragging) {
-                ctx.fillStyle = "rgba(140, 198, 109, 1)";
+            if (bar_x * 2 >= mousePosX - 2 && bar_x * 2 <= mousePosX + 2 && mousePosX && !dragging) {
+                //ctx.fillStyle = "rgba(140, 198, 109, 1)";
+                ctx.fillStyle = 'rgba(173,255,60, 1)'
             
             // drag to select last bar
-            } else if (GlobalStore.dragging) {
+            } else if (dragging) {
                 let filterL = Math.min(filterX.press, mousePosX);
                 let filterR = Math.max(filterX.press, mousePosX);
 
-                GlobalStore.filterL = filterL;
-                GlobalStore.filterR = filterR;
+                filterLGlobal = filterL;
+                filterRGlobal = filterR;
 
                 if (bar_x * 2 >= filterL && bar_x * 2 <= filterR) {
-                    ctx.fillStyle = "rgba(140, 198, 109, 1)";
+                    //ctx.fillStyle = "rgba(140, 198, 109, 1)";
+                    ctx.fillStyle = 'rgba(173,255,60, 1)'
                 } else {
-                    ctx.fillStyle = "rgba(140, 198, 109, .5)"
+                    //ctx.fillStyle = "rgba(140, 198, 109, .5)"
+                    ctx.fillStyle = 'rgba(173,255,60, .5)'
                 }
 
             // audio content filtered
-            } else if (GlobalStore.filtered) {
+            } else if (filtered) {
 
-                if (bar_x * 2 >= GlobalStore.filterL && bar_x * 2 <= GlobalStore.filterR) {
-                    ctx.fillStyle = "rgba(140, 198, 109, 1)";
+                if (bar_x * 2 >= filterLGlobal && bar_x * 2 <= filterRGlobal) {
+                    //ctx.fillStyle = "rgba(140, 198, 109, 1)";
+                    ctx.fillStyle = 'rgba(173,255,60, 1)'
                 } else {
                     ctx.fillStyle = "rgba(0,0,0,.05)"
                 }
 
             // no current interaction
             } else {
-                ctx.fillStyle = "rgba(140, 198, 109, .5)";
+                //ctx.fillStyle = "rgba(140, 198, 109, .5)";
+                ctx.fillStyle = 'rgba(173,255,60, .5)'
             }
 
             ctx.beginPath();
@@ -228,7 +160,7 @@ createVisualization(){
             ctx.lineTo(destX, canvas.height);
             ctx.lineTo(originX, canvas.height);
             ctx.lineTo(originX, originY);
-            ctx.strokeStyle = "#8CC66D";
+            ctx.strokeStyle = "#ADFF3C"//"#8CC66D";
             ctx.fill();
             ctx.moveTo(destX, destY);
             originY = destY;
@@ -236,29 +168,120 @@ createVisualization(){
             logIndex = logIndex * logBase;
         }
     };
-    if (!GlobalStore.isResizing) {
+    if (!isResizing) {
         renderFrame();
     }
 }
 
-render() {
-    return (
-        <div>
-            <div id="mp3_player">
-                <div id="audio_box"></div>
-                <canvas
-                    ref="helperCanvas"
-                    id="hover-helper">
-                </canvas>
-                <canvas
-                    ref="analyzerCanvas"
-                    id="analyzer"
-                    className="waveform-viz">
-                </canvas>
-            </div>
-        </div>
-    );
-}
+
+releaseAudioContext = () => {
+    if(analyser && vizAudioSrc && lpContext){
+        analyser.disconnect(lpContext);
+        vizAudioSrc.disconnect(lpContext);
+        vizAudioSrc = undefined;
+        lpContext = undefined;
+    }
 }
 
-export default observer(FrequencyAnalyser);
+resetVizAudioSrc = () => {
+    vizAudioSrc = undefined;
+}
+
+setVizAudioSrc = () => {
+    console.log("setting src")
+    if (vizAudioSrc === undefined) {
+        console.log("src is undefined")
+        // Build element
+        // Checks if user is on landing page
+        vizAudioSrc = context.createMediaElementSource(vizAudio);
+      }
+}
+
+setAudioNode = () =>{
+    if(context === undefined){
+        context = new AudioContext();
+    }
+    analyser = context.createAnalyser();
+}
+
+disconnectAudioNodes = () =>{
+    tanalyser.disconnect(this.context);
+    if (vizAudioSrc != null) {
+        vizAudioSrc.disconnect();
+    }
+    //this.releaseAudioContext();
+}
+
+connectAudioNodes = (context) => {
+    if(context){
+        context.resume();
+    }
+    console.log(vizAudioSrc)
+    vizAudioSrc.connect(analyser);
+
+    //lowpass filter
+    lp = context.createBiquadFilter();
+    lp.type = "lowpass"
+    lp.frequency.value = 20000;
+    //highpass filter
+    hp = context.createBiquadFilter();
+    hp.type = "highpass"
+    hp.frequency.value = 1;
+    //gain
+    gain = context.createGain();
+
+    vizAudioSrc.connect(lp);
+    lp.connect(hp);
+    hp.connect(gain);
+    gain.connect(context.destination)
+}
+
+filterAudio = (coords) => {
+
+    // sort out left/right values
+    var filterL = Math.min(coords.press, coords.release);
+    filterL = Math.max(filterL, 1);
+    var filterR = Math.max(coords.press, coords.release);
+    filterR = Math.min(filterR, 600)
+
+
+    // linear math
+    // var filterL = 20000 * (filterL / 600);
+    // var filterR = 20000 * (filterR / 600);
+
+    // log math
+    let min = 1;
+    let max = 20000;
+    let b = Math.log(max/min)/(max/min);
+    let a = 20000 / Math.exp(b*20000);
+    filterL = a * Math.exp(b*filterL);
+    filterR = a * Math.exp(b*filterR);
+    filterL = (filterL - 1) * 20000;
+    filterR = (filterR - 1) * 20000;
+
+    hp.frequency.value = filterL;
+    lp.frequency.value = filterR;
+
+    let freqText = Math.round(hp.frequency.value) + "Hz - " + Math.round(lp.frequency.value) + "Hz"
+    document.getElementById("freq-text").innerText = freqText;
+}
+
+resetFilter = () => {
+    hp.frequency.value = 20;
+    lp.frequency.value = 20000;
+    filtered = false;
+}
+
+isPlaying = false;
+
+handleButton = (event) =>{
+    if(!context){
+        context = new AudioContext;
+    }
+
+    if(!isPlaying){
+        vizAudio.play();
+    }
+    event.preventDefault();
+    createVisualization();
+}

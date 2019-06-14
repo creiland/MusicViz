@@ -2,17 +2,39 @@
 <link rel="stylesheet" href='StereoD3.css'>
 <link rel="stylesheet" href="https://use.typekit.net/euq6nxa.css">
 
-
-  <div id="viz-container"></div>
-  <canvas
+  <h1 id='title'>Lissajous Vectorscope</h1>
+  <div id="viz-container">
+      <div id='text-container'>
+          <h2>Instructions</h2>
+          <p>Click visualize audio to begin playing audio and visualizing in real time. Click and drag to highlight an area of the graph</p>
+          <h2>Explanation</h2>
+          <p>The Lissajous Vectorscope visualizes the stereo image of a song.
+              The X-Axis represents the decibel level of the right channel and the Y-axis represents the decibel level of the left channel. 
+              Each point represents a different frequency in the waveform, so there are a total of 4096 dots at all times, 
+              each with an x value representing the loudness in the right channel and a y representing the loudness in the left.
+              A mono sound (with equivalent right and left channels) will produce a perfect diagonal line through the origin with a slope of 1.
+              Fit lines with negative slope indicate phase issues, and horizontal and vertical lines represent the absence of the left and right channel respectively.
+               Points are color coded by their distance, from the perfect mono line, with hotter colors representing sounds that are wider in the stereo space. 
+               This can be used to visualize issues in the stereo imaging of a piece that may lead to phasing or distortion, 
+               or can be used to see how specific songs fit in the soundstage of a song, to more accurately tune stereo placement of musical elements for creative effect.
+               For example, in the reference track, there is a wooden block sound that is more reverberant and wide, creating a more circular pattern of warmly colored dots.
+             </p>
+      </div>
+  </div>
+  
+  
+  <!-- <canvas
     id="analyzerCanvas">
-  </canvas>
+  </canvas> -->
 
-  <audio id="audio" controls>
-    <source src="FreezingRain.wav" type="audio/wav"/>
-  </audio>
-  <button onclick="handleButton(event)">Set Audio</button>
-  <button onclick="play(event)">Vizualize Audio</button>
+  <div class='controls'>
+      <button onclick="play(event)">Vizualize Audio</button>
+      <audio id="audio" controls>
+          <source src="FreezingRain.wav" type="audio/wav"/>
+        </audio>
+        
+  </div>
+  
 
   <script src="//d3js.org/d3.v4.min.js"></script>
 <script src='StereoD3.js'></script>

@@ -143,14 +143,20 @@ let vectorscope = {};
 
 handleButton = (event) => {
   event.preventDefault()
-  vectorscope = new Vectorscope();
+  setAudio();
+  //vectorscope = new Vectorscope();
   //vectorscope.draw()
 }
 
 let playing = false;
 
 play = (event) => {
+  event.preventDefault()
   var audioRef = document.getElementById("audio")
+  if(!context){
+    setAudio();
+  }
+
   if (!playing) {
     audioRef.play();
     renderDots();
@@ -196,10 +202,19 @@ draw = () => {
   canvasCtx.fill();
 }
 
+var selectionTopLeftX;
+var selectionTopLeftY;
+var selectionBottomRightX;
+var selectionTBottomRightY;
+
 var node = d3.select('#viz-container')
   .append('svg')
   .attr("width", 500)
   .attr("height", 500)
+
+  node
+  .on("mousedown", mousedown)
+    .on("mouseup", mouseup);
 
 node
   .append('g')
@@ -259,8 +274,6 @@ node.append('text')
     return "translate(" + 460 + ", " + 250 + ")"
   })
 
-
-
 renderDots = () => {
   window.requestAnimationFrame(renderDots)
   var binCount = analyserR.fftSize;
@@ -299,17 +312,23 @@ renderDots = () => {
     })
     .attr("cy", function (d, i) { return y(d - 128); })
     .attr('r', 1.7)
+    .attr("id", 'dot')
     .attr("transform", function (d, i) {
       return "translate(" + (width / 2) + ", " + (height / 2) + ")"
     })
     .style('fill', function (d, i) {
       var colorData = Math.abs(rightData[i] - d)
-      return color(colorData)
+      if(pointIsWithinSelection(rightData[i]-128 + width/2, y(d - 128) + height/2)){
+        return 'blue'
+      } else {
+        return color(colorData)
+      }
     })
 
   dot
     .enter()
     .append("circle")
+    .attr("id", 'dot')
     .attr("cx", function (d, i) {
       return rightData[i] - 128;
     })
@@ -322,7 +341,11 @@ renderDots = () => {
     })
     .style('fill', function (d, i) {
       var colorData = Math.abs(rightData[i] - d)
-      return color(colorData)
+      if(pointIsWithinSelection(rightData[i]-128 + width/2, y(d - 128) + height/2)){
+        return 'blue'
+      } else {
+        return color(colorData)
+      }
     })
 
   dot.exit()
@@ -356,4 +379,89 @@ renderSVGDots = () => {
       canvasCtx.arc(R + middleX, L + canvas.height / 2, 2, 0, 2 * Math.PI, true);
     }
   }
+}
+
+function mousedown() {
+  var m = d3.mouse(this);
+
+  resetCurrentSelection();
+
+  node.selectAll('rect').remove();
+  node.selectAll('g.textCont').remove();
+  node.selectAll('text.freqText').remove();
+
+  setSelectionTopLeft(m);
+
+  rect = node.append("rect")
+      .attr("x", m[0])
+      .attr("y", m[1])
+      .attr("height", 0)
+      .attr("width", 0)
+      .style("fill", 'rgb(83,83,83, .7)')
+      .style("stroke", 'black')
+
+    textContainer = node.append("g")
+    .attr('class', 'textCont')
+    .attr("x", m[0])
+    .attr("y", m[1])
+    .attr("height", 0)
+    .attr("width", 0)
+    .attr("transform", function (d, i) {
+      return "translate(" + (m[0]) + ", " + m[1] + ")"
+    })
+
+  node.on("mousemove", mousemove);
+}
+
+function mousemove(d) {
+  var m = d3.mouse(this);
+
+  setSelectionBottomRight(m);
+
+  rect.attr("width", Math.max(0, m[0] - +rect.attr("x")))
+      .attr("height", Math.max(0, m[1] - +rect.attr("y")))
+
+      node.selectAll('text.freqText').remove();
+
+  textContainer.attr("width", Math.max(0, m[0] - +textContainer.attr("x")))
+                .attr("height", Math.max(0, m[1] - +textContainer.attr("y")))
+                .append("text")
+                .attr('class', 'freqText')
+                .text(getSelectionText())
+                .attr("transform", function (d, i) {
+                  return "translate(" + (0) + ", " + -10 + ")"
+                })
+}
+
+function mouseup() {
+  node.on("mousemove", null);
+}
+
+function setSelectionTopLeft(m){
+  selectionTopLeftX = m[0];
+  selectionTopLeftY = m[1]
+}
+
+function setSelectionBottomRight(m){
+  selectionBottomRightX = m[0];
+  selectionTBottomRightY = m[1]
+}
+
+function getSelectionText(){
+  return "(" + Math.round(selectionTopLeftX) + ", " + Math.round(selectionTopLeftY) +") (" + Math.round(selectionBottomRightX )+ ", " + Math.round(selectionTBottomRightY) + ")"
+}
+
+pointIsWithinSelection = (x, y) => {
+  if(x < selectionBottomRightX && x > selectionTopLeftX && y < selectionTBottomRightY && y > selectionTopLeftY){
+    return true;
+  } else {
+    return false
+  }
+}
+
+resetCurrentSelection = () => {
+  selectionBottomRightX = 1
+  selectionTBottomRightY = 1
+  selectionTopLeftX = 1
+  selectionTopLeftY = 1
 }

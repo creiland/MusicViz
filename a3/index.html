@@ -3,9 +3,23 @@
 <link rel="stylesheet" href="https://use.typekit.net/euq6nxa.css">
 <script src="//d3js.org/d3.v4.min.js"></script>
 
-  <div id="viz-container"></div>
+  <div id="viz-container">
+      <div id='text-container'>
+          <h2>Instructions</h2>
+          <p>Mouse over the waveform see the time associated with that part of the waveform. Click to add a comment at that specific time. 
+            After posting a comment, click on the highlighted track time to go to that position in the song.</p>
+          <h2>Explanation</h2>
+          <p>The Waveform visualization is fairly common and easy to understand. 
+            It shows the decibel level of the song (Y-Axis) at for each second in the song (X-Axis)
+             </p>
+      </div>
+  </div>
 
-
+  <div class='controls'>
+      <audio id="audio" controls preload="metadata">
+          <source src="./server/src/FreezingRain.wav" type="audio/wav"/>
+        </audio>
+  </div>
 
 
 <script src='WaveformD3.js'></script>

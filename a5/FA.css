@@ -1,14 +1,7 @@
-body{
-    height: 100%;
-}
 
 * {
     font-family: 'Source Sans Pro', sans-serif;
   }
-
-html{
-    height:100%;
-}
 
 audio{
     display:block;
@@ -23,3 +16,146 @@ audio{
     src: local('Gilroy-ExtraBold'), url(./assets/font/Gilroy-ExtraBold.otf) format('woff');
   }
 
+  html{
+    font-family: open-sans, sans-serif;
+    font-weight: 400;
+  }
+  
+  body{
+    width:100%;
+  }
+  
+  .input{
+    margin-top: 5em;
+    margin-left: 50%;
+    display: flex;
+    flex-direction: column
+  }
+  
+  label{
+    margin-bottom:1em;
+  }
+
+  .viz-container{
+    width: 1em
+  }
+
+
+#analyzer {
+    transition: display 1s;
+    
+    z-index: 10;
+}
+
+#mp3_player{
+    max-width: 606px;
+    position: relative;
+    background-color: #191414;
+    border-radius: 30px;
+}
+
+canvas{
+    position: relative;
+    width: 600px;
+    border-radius: 30px;
+}
+
+canvas#hover-helper{
+    position: absolute;
+    z-index: 1000;
+}
+
+.filter-results{
+    top: 100px;
+    position: absolute;
+    height: 100px;
+    width: 600px;
+    z-index: 1000;
+    border-radius: 30px;
+    text-align: center;
+    line-height: 100px;
+    z-index: 1;
+}
+
+.filter-results>span{
+    font-family: proxima-nova-condensed,sans-serif;
+    font-weight: 900;
+    font-style: normal;
+    text-align: center;
+    vertical-align: middle;
+    line-height: normal;
+    display: inline-block;
+    color: rgb(83,83,83, .7);
+    z-index: 1;
+    font-size: 70px;
+}
+
+button{
+    border-radius: 50px;
+    width: 150px;
+    height: 50px;
+    font-size: 15px;
+    text-align: center;
+    padding: 5px;
+    box-shadow: 0 0 0 2pt #212225;
+    color: #212225;
+    align-items: center;
+    border-style: none;
+    margin-right: 10px;
+  }
+
+  button:hover{
+    background: #212225;
+    color: #B3B3B3;
+    cursor: pointer;
+}
+
+.controls{
+    margin-top: 10px;
+    display: inline-flex;
+    width: 606px;
+}
+
+.controls > audio, .controls > button{
+    display: inline-block;
+}
+
+.controls > audio{
+    width: 80%;
+}
+
+#title{
+    max-width: 500px;
+    text-align: center
+}
+
+#text-container{
+    width: 500px;
+    position: absolute;
+    left: 650px;
+    background-color:#212225;
+    padding: 15px;
+    padding-top: 0px;
+    border-radius: 30px;
+    
+}
+
+#text-container>p{
+    color: #B3B3B3;
+    font-weight: 300;
+    margin-top: 5px
+}
+
+#text-container>h2{
+    color: #ffffff;
+    margin-bottom: 5px
+}
+
+.main-container{
+    display: inline-flex;
+    width: 100%;
+}
+
+.main-container > div{
+    display: inline-block;
+}
