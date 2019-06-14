@@ -1,4 +1,4 @@
-var wave_uri = "http://public.jm3.net/d3/geiger.json";
+let wavDataURL = "http://media.produce-music.com/public/viz/WaveformData.json";
 
 var max_points = 1024;
 var width = 880,
@@ -15,7 +15,7 @@ audioRef.onloadedmetadata = function() {
 
 let color = "#ce243d"
 
-d3.json( wave_uri, function(error, json) {
+d3.json(waveDataURL, function(error, json) {
     if(error){
       console.log(error)
     }
@@ -275,3 +275,7 @@ d3.json( wave_uri, function(error, json) {
     let seconds = minutesToSeconds(this.innerText);
     audioRef.currentTime = seconds;
   }
+
+
+
+  //sorry about this. only way around cors for now
