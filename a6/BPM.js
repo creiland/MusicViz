@@ -57,12 +57,24 @@ play = () => {
         //         .then(resp => resp.arrayBuffer())
         //         .then(buf => offlineContext(buf))
         //   };
-        
-    
 }
 
-getBeat = () => {
+let kickPattern = []
+let currentKickIndex = 0;
 
+let currentAngle = 0;
+
+getBeat = () => {
+    //console.log(kickPattern[currentKickIndex] % audioRef.currentTime)
+    if(kickPattern[currentKickIndex] - audioRef.currentTime < .01){
+        console.log(audioRef.currentTime)
+        console.log(kickPattern[currentKickIndex])
+        currentAngle += 0.25;
+        if(currentAngle>1){
+            currentAngle = 0;
+        }
+        currentKickIndex++;
+    }
     var time = audioRef.currentTime / audioRef.duration
 
     var test = d3.selectAll('svg').selectAll('g.bar')
@@ -211,6 +223,13 @@ function offlineContext(buffer) {
         }).splice(0, 5);
 
         BPMText = top[0].tempo;
+
+        let kickInterval = 1 / (+BPMText / 60)
+            let newTime = 0;
+            while(newTime < audioRef.duration){
+                newTime += kickInterval;
+                kickPattern.push(newTime)
+            }
         
         if(isPlaying){
             requestAnimationFrame(getBeat)
