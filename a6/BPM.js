@@ -1,7 +1,7 @@
 // Inspired by http://joesul.li/van/beat-detection-using-web-audio/ and https://github.com/JMPerez/beats-audio-api/
 
 let context;
-let audioRef;
+let audioRef = document.getElementById('audio')
 let source;
 let analyser;
 let filter;
@@ -9,13 +9,14 @@ let gain;
 
 let BPM;
 
+let audioFile = 'short.mp3'
+
 
 function setAudio(event) {
     event.preventDefault();
 
     // setting up source
     context = new AudioContext();
-    audioRef = document.getElementById("audio")
     source = context.createMediaElementSource(audioRef)
 
     // create analyser node
@@ -38,13 +39,53 @@ function setAudio(event) {
     //analyser.fftSize = 4096;
 }
 
+var isPlaying = false;
+
 play = () => {
+    if(!isPlaying){
+        audioRef.play();
+        isPlaying = true;
+    }
     event.preventDefault()
     //getBPM();
-    fetch('./rave.mp3')
+    fetch(audioFile)
         .then(resp => resp.arrayBuffer())
         .then(buf => offlineContext(buf))
 
+        // audioRef.onloadedmetadata = function() {
+        //     fetch(audioFile)
+        //         .then(resp => resp.arrayBuffer())
+        //         .then(buf => offlineContext(buf))
+        //   };
+        
+    
+}
+
+getBeat = () => {
+
+    var time = audioRef.currentTime / audioRef.duration
+
+    var test = d3.selectAll('svg').selectAll('g.bar')
+
+    test.selectAll('rect.cur-time').remove()
+    test.
+    append('rect')
+    .attr('class', 'cur-time')
+    .attr('x', time * 700)
+        .attr('y', 0)
+    .attr('height', 50)
+    .attr('width', 2)
+    .attr('fill', 'red')
+
+    var secondsBetweenBeats = Math.round(1000*(1/(+BPMText/60)))/1000
+    var currentTime = Math.round(1000*audioRef.currentTime)/1000
+
+    //console.log(currentTime % secondsBetweenBeats)
+    
+    if(currentTime % secondsBetweenBeats < 0.01){
+        
+    }
+    requestAnimationFrame(getBeat)
 }
 
 print = () => {
@@ -122,9 +163,11 @@ function getIntervals(peaks) {
 
 var BPMText;
 
+let audioSource = document.getElementById('audio-src')
+
 function offlineContext(buffer) {
     var OfflineContext = window.OfflineAudioContext || window.webkitOfflineAudioContext;
-    var offlineContext = new OfflineContext(2, 30 * 44100, 44100);
+    var offlineContext = new OfflineContext(2, audioRef.duration * 44100, 44100);
 
     offlineContext.decodeAudioData(buffer, function (buffer) {
 
@@ -157,15 +200,65 @@ function offlineContext(buffer) {
         var peaks = getPeaks([buffer.getChannelData(0), buffer.getChannelData(1)]);
         var groups = getIntervals(peaks);
 
+        var bufferLength = buffer.length
+
+        audioSource.src = URL.createObjectURL(new Blob([buffer]));
+
+        renderPeaks(peaks, bufferLength);
+
         var top = groups.sort(function (intA, intB) {
             return intB.count - intA.count;
         }).splice(0, 5);
 
-        console.log(top[0].tempo);
         BPMText = top[0].tempo;
-        document.getElementById('bpm-text').textContent = BPMText;
-
+        
+        if(isPlaying){
+            requestAnimationFrame(getBeat)
+            renderArc();
+            document.getElementById('bpm-text').textContent = BPMText;
+        }
     }
+}
+
+renderPeaks = (data, bufferLength) => {
+    height = 50;
+    width = 700;
+
+    console.log(bufferLength / 44100)
+    
+    var x = d3.scaleLinear()
+        .domain([0, bufferLength]);
+
+
+    var svg = d3.select('#peaks-viz')
+        .append('svg')
+        .attr("width", width)
+        .attr("height", height)
+
+    var bar = svg.append('g')
+        .attr('class', 'bar')
+        .attr("width", width)
+        .attr("height", height)
+
+    // bar.append('rect')
+    //     .attr("width", width)
+    //     .attr("height", height)
+    //     .attr('color', "rgba(52,58,64, 1)")
+
+    var g = bar.selectAll('rect')
+        .data(data)
+        .enter()
+        // .append("g")
+        // .attr("transform", function(d, i){ 
+        //     return "translate(" + x(d.position) * width + ",0)"})
+        .append('rect')
+        .attr('fill', 'blue')
+        .attr('height', height)
+        .attr('width', 1)
+        .attr('x', function(d) {return x(d.position) * width})
+        .attr('y', 0)
+        .style('background-color', 'red')
+        .style('z-index', '1000')
 }
 
 
@@ -208,15 +301,15 @@ renderArc = () => {
         .attr('font-size', 100)
         .attr('id', 'bpm-text')
         .style("text-anchor", "middle")
-        .style('alignment-baseline', 'middle')
+        .style('alignment-baseline', 'middle');
 
     var angle = 0;
 
-    d3.interval(function () {
-        foreground.transition()
-            .duration(BPMText / 60 * 1000 / 4)
-            .attrTween("d", arcTween());
-    }, 1500);
+    // d3.interval(function () {
+    //     foreground.transition()
+    //         .duration(BPMText / 60 * 1000 / 4)
+    //         .attrTween("d", arcTween());
+    // }, 1500);
 
     // Returns a tween for a transition’s "d" attribute, transitioning any selected
     // arcs from their current angle to the specified new angle.
@@ -227,10 +320,10 @@ renderArc = () => {
             angle = 0;
         }
 
-        if(!newAngle){
+        if (!newAngle) {
             var newAngle = angle * tau;
         }
-        
+
         // The function passed to attrTween is invoked for each selected element when
         // the transition starts, and for each element returns the interpolator to use
         // over the course of transition. This function is thus responsible for
@@ -272,7 +365,7 @@ renderArc = () => {
                 // (that is, the end angle) rather than the path string itself.
                 // Interpolating the angles in polar coordinates, rather than the raw path
                 // string, produces valid intermediate arcs during the transition.
-                if(loading){
+                if (loading) {
                     return loadingArc(d)
                 }
                 return arc(d);
@@ -281,10 +374,14 @@ renderArc = () => {
     }
 }
 
-fetch('./rave.mp3')
-    .then(resp => resp.arrayBuffer())
-    .then(buf => offlineContext(buf))
-renderArc();
+    audioRef = document.getElementById("audio")
+
+    // audioRef.onloadedmetadata = function() {
+    //     fetch(audioFile)
+    //         .then(resp => resp.arrayBuffer())
+    //         .then(buf => offlineContext(buf))
+    //     renderArc();
+    //   };
 
   //need to figure out how to sync
   // need to detect sync

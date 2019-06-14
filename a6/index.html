@@ -4,16 +4,15 @@
 
 
   <div id="viz-container"></div>
-  <canvas
-    id="analyzerCanvas">
-  </canvas>
+  <div id="peaks-viz"></div>
 
-  <audio id="audio" controls>
-    <source src="rave.mp3" type="audio/wav"/>
-  </audio>
-  <button onclick="setAudio(event)">Set Audio</button>
-  <button onclick="play(event)">Vizualize BPM</button>
-  <button onclick="print(event)">Print BPM</button>
+  <div class='controls'>
+      <button onclick="play(event)">Vizualize Audio</button>
+      <audio id="audio" controls preload="metadata">
+          <source id='audio-src' src='./short.mp3' type="audio/wav"/>
+        </audio>
+  </div>
+
   <input id="file-input" type="file" value="./rave.mp3">
 
   <script src="//d3js.org/d3.v4.min.js"></script>
