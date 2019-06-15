@@ -1,13 +1,40 @@
 <!DOCTYPE html>
 <link rel="stylesheet" href="https://use.typekit.net/euq6nxa.css">
+<link rel="stylesheet" href="./Final.css">
 
+<ul>
+  <li><a href='./a1/index.html'>Basic D3</a></li>
+  <li><a href='./a2/index.html'>Interactive D3</a></li>
+  <li><a href='./a3/index.html'>Waveform</a></li>
+  <li><a href='./a4/index.html'>Lissajous Vectorscope</a></li>
+  <li><a href='./a5/index.html'>Frequency Analyser</a></li>
+  <li><a href='./a6/index.html'>BPM Analyser</a></li>
+  <li><a href='./a7/index.html'>Synthesizer</a></li>
+</ul>
 
-  <a href='./a1/index.html'>Basic D3</a>
-  <a href='./a2/index.html'>Interactive D3</a>
-  <a href='./a3/index.html'>Waveform</a>
-  <a href='./a4/index.html'>Lissajous Vectorscope</a>
-  <a href='./a5/index.html'>Frequency Analyser</a>
-  <a href='./a6/index.html'>BPM Analyser</a>
-  <div id="peaks-viz"></div>
+  <div id="viz-container">
+      <div id='composer-container'></div>
+      <div id='visualizations'>
+        <div id='FA-cont'>
+          <div class="filter-results"><span id="freq-text"></span></div>
+          <div id="audio_box"></div>
+          <canvas
+              ref="helperCanvas"
+              id="hover-helper">
+          </canvas>
+          <canvas
+              ref="analyzerCanvas"
+              id="analyzer"
+              className="waveform-viz">
+          </canvas>
+        </div>
+        <div id='stereo-cont'></div>
+      </div>
+  </div>
+
+  
+
+  <div id="synthSliders"><div style="display: inline-block; margin-left: 89.5px; text-align: center;"><p>Pitch</p><p><input type="range" min="0" max="1" step="0.0001" value=".5" id="Pitch" style="width: 127px;"></p></div><div style="display: inline-block; margin-left: 89.5px; text-align: center;"><p>BPM</p><p><input type="range" min="0" max="1" step="0.0001" value=".5" id="BPM" style="width: 127px;"></p></div><div style="display: inline-block; margin-left: 89.5px; text-align: center;"><p>Duration</p><p><input type="range" min="0" max="1" step="0.0001" value=".5" id="Duration" style="width: 127px;"></p></div></div>
 
 <script src="//d3js.org/d3.v4.min.js"></script>
+<script src='./Final.js'></script>

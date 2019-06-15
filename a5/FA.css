@@ -43,7 +43,6 @@ audio{
 
 #analyzer {
     transition: display 1s;
-    
     z-index: 10;
 }
 

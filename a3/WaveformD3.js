@@ -1,4 +1,4 @@
-let wavDataURL = "http://media.produce-music.com/public/viz/WaveformData.json";
+let waveDataURL = "http://media.produce-music.com/public/viz/WaveformData.json";
 
 var max_points = 1024;
 var width = 880,

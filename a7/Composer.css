@@ -1,0 +1,121 @@
+html{
+    font-family: open-sans, sans-serif;
+    font-weight: 400;
+  }
+  
+  body{
+    width:100%;
+  }
+  
+  .input{
+    margin-top: 5em;
+    margin-left: 50%;
+    display: flex;
+    flex-direction: column
+  }
+  
+  label{
+    margin-bottom:1em;
+  }
+
+  #title{
+    max-width: 500px;
+    text-align: center
+}
+
+#text-container{
+    width: 500px;
+    position: absolute;
+    left: 800px;
+    background-color:#212225;
+    padding: 15px;
+    padding-top: 0px;
+    border-radius: 30px;
+    
+}
+
+#text-container>p{
+    color: #B3B3B3;
+    font-weight: 300;
+    margin-top: 5px
+}
+
+#text-container>h2{
+    color: #ffffff;
+    margin-bottom: 5px
+}
+
+audio{
+    width: 880px;
+}
+
+.controls{
+    margin-top: 50px;
+    display: inline-flex;
+}
+
+.controls > audio, .controls > button{
+    display: inline-block;
+}
+
+@font-face {
+    font-family: 'Gilroy-ExtraBold';
+    src: local('Gilroy-ExtraBold'), url(./assets/font/Gilroy-ExtraBold.otf) format('woff');
+  }
+
+  button{
+    border-radius: 50px;
+    width: 100px;
+    height: 50px;
+    font-size: 10px;
+    text-align: center;
+    padding: 5px;
+    box-shadow: 0 0 0 2pt #212225;
+    color: #212225;
+    align-items: center;
+    border-style: none;
+    margin-right: 10px;
+  }
+
+  button:hover{
+    background: #212225;
+    color: #B3B3B3;
+    cursor: pointer;
+}
+
+button.post:hover{
+  background-color: rgba(52,58,64, .9)
+}
+
+img{
+  height: 20px;
+  width: 20px;
+  margin-right: 5px
+}
+
+.user-area{
+  display: flex;
+  flex-direction: row;
+}
+
+.time-tag:hover{
+  cursor: pointer;
+  color: rgb(121, 226, 64)!important;
+}
+
+.time-tag{
+  width: 50px;
+  margin-right: 5px;
+}
+
+.content-area{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.new-comment:hover{
+  z-index: 1000;
+  background-color: rgba(52,58,64, 1)!important;
+  opacity: 1;
+}
